@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -79,7 +80,14 @@ public class Main extends ApplicationAdapter {
     }
 
     private void logic() {
+        float worldWidth = viewport.getWorldWidth();
+        float worldHeight = viewport.getWorldHeight();
+        float headWidth = headSprite.getWidth();
+        float headHeight = headSprite.getHeight();
 
+        //so head does not go past world border
+        headSprite.setX(MathUtils.clamp(headSprite.getX(), 0, worldWidth - headWidth));
+        headSprite.setY(MathUtils.clamp(headSprite.getY(), 0, worldHeight - headHeight));
     }
 
     private void draw() {
