@@ -1,25 +1,37 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     SpriteBatch spriteBatch;
     FitViewport viewport;
+
     private Texture apple;
     private Texture body;
     private Texture head;
+    private Texture background;
+
+    //grid settings
+    private static final int tileSize = 8; //8 pixels
+    private static final int worldHeight = 17; //17 grid
+    private static final int worldWidth = 17;
 
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(8, 5);
+        //grid units
+        viewport = new FitViewport(worldWidth, worldHeight);
+
         apple = new Texture("apple.png");
         body = new Texture("body.png");
         head = new Texture("head.png");
+        background = new Texture("background (1).png");
     }
 
     @Override
@@ -44,7 +56,17 @@ public class Main extends ApplicationAdapter {
     }
 
     private void draw() {
+        ScreenUtils.clear(Color.BLACK);
+        viewport.apply();
+        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        spriteBatch.begin();
 
+        //set wordwidth and worldheight
+        float worldWidth = viewport.getWorldWidth();
+        float worldHeight = viewport.getWorldHeight();
+
+        spriteBatch.draw(head, 0, 0, 1, 1);
+        spriteBatch.end();
     }
 
     @Override
