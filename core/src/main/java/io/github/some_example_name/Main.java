@@ -1,9 +1,12 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -11,6 +14,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Main extends ApplicationAdapter {
     SpriteBatch spriteBatch;
     FitViewport viewport;
+
+    //new sprite variable for head
+    Sprite headSprite;
 
     private Texture apple;
     private Texture body;
@@ -32,6 +38,10 @@ public class Main extends ApplicationAdapter {
         body = new Texture("body.png");
         head = new Texture("head.png");
         background = new Texture("background (1).png");
+
+        headSprite = new Sprite(head);
+        headSprite.setSize(1, 1); //1 grid tile
+        headSprite.setPosition(8,8); //center
     }
 
     @Override
@@ -48,6 +58,23 @@ public class Main extends ApplicationAdapter {
     }
 
     private void input() {
+        float speed = 4f;
+        float delta = Gdx.graphics.getDeltaTime(); //curret delta for consistenycy
+
+        //when press right key
+        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            headSprite.translateX(1);
+        }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            headSprite.translateX(-1);
+        }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            headSprite.translateY(1);
+        }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            headSprite.translateY(-1);
+        }
+
 
     }
 
@@ -61,11 +88,8 @@ public class Main extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-        //set wordwidth and worldheight
-        float worldWidth = viewport.getWorldWidth();
-        float worldHeight = viewport.getWorldHeight();
+        headSprite.draw(spriteBatch);
 
-        spriteBatch.draw(head, 0, 0, 1, 1);
         spriteBatch.end();
     }
 
