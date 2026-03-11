@@ -21,13 +21,14 @@ public class Main extends ApplicationAdapter {
     //new sprite variable for head
     Sprite headSprite;
 
+    //load in textures
     private Texture apple;
     private Texture body;
     private Texture head;
     private Texture background;
     public String lastKeyPressed; //chefck last key pressed for rotation
 
-
+    //multiple apples array
     Array<Sprite> appleSprite;
 
     //grid settings
@@ -35,9 +36,16 @@ public class Main extends ApplicationAdapter {
     private static final int worldHeight = 17; //17 grid
     private static final int worldWidth = 17;
 
+    //constant movement
+    float moveTimer = 0f;
+    float moveDelay = 0.2f;
+    int dirX = 0;
+    int dirY = -1; //starts by moving downwards
+
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
+
         //grid units
         viewport = new FitViewport(worldWidth, worldHeight);
 
@@ -50,6 +58,8 @@ public class Main extends ApplicationAdapter {
         headSprite = new Sprite(head);
         headSprite.setSize(1, 1); //1 grid tile
         headSprite.setPosition(8,8); //center
+        headSprite.setOrigin(headSprite.getWidth() / 2, headSprite.getHeight() / 2); //set the origin of the head
+
     }
 
     @Override
@@ -68,58 +78,31 @@ public class Main extends ApplicationAdapter {
     private void input() {
         float speed = 4f;
         float delta = Gdx.graphics.getDeltaTime(); //curret delta for consistenycy
-        headSprite.setOrigin(headSprite.getWidth() / 2, headSprite.getHeight() / 2);
 
         //when press right key
-        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            if (lastKeyPressed == "RIGHT") { //check if user clicked right before this
-                headSprite.translateX(1);
-            }
-            else {
-                headSprite.translateX(1);
-                headSprite.setRotation(0f); //set to 0 first
-                headSprite.setRotation(90f);
-                lastKeyPressed = "RIGHT"; //if they didnt then set it right now
-            }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && dirX != 1) {
+            dirY = 0;
+            dirX = 1;
+            headSprite.setRotation(90);
         } //end of RIGHT
 
-        else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            if (lastKeyPressed == "LEFT") {
-                headSprite.translateX(-1);
-            }
-            else {
-                headSprite.translateX(-1);
-                headSprite.setRotation(0f); //set to 0 first
-                headSprite.setRotation(-90f);
-                lastKeyPressed = "LEFT";
-            }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && dirX != -1) {
+            dirY = 0;
+            dirX = -1;
+            headSprite.setRotation(-90);
         } //end of LEFT
 
-        else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            if (lastKeyPressed == "UP") {
-                headSprite.translateY(1);
-            }
-            else {
-                headSprite.translateY(1);
-                headSprite.setRotation(0f);
-                headSprite.setRotation(180);
-                lastKeyPressed = "UP";
-            }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && dirY != 1) {
+            dirY = 1;
+            dirX = 0;
+            headSprite.setRotation(180);
         } //end of UP
 
-        else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            if (lastKeyPressed == "DOWN") {
-                headSprite.translateY(-1);
-            }
-            else {
-                headSprite.translateY(-1);
-                headSprite.setRotation(0f);
-                lastKeyPressed = "DOWN";
-            }
+        else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && dirY != -1) {
+            dirY = -1;
+            dirX = 0;
+            headSprite.setRotation(0);
         } //end of DOWN
-
-
-
     }
 
     private void logic() {
@@ -132,6 +115,14 @@ public class Main extends ApplicationAdapter {
         headSprite.setX(MathUtils.clamp(headSprite.getX(), 0, worldWidth - headWidth));
         headSprite.setY(MathUtils.clamp(headSprite.getY(), 0, worldHeight - headHeight));
 
+        float delta = Gdx.graphics.getDeltaTime();
+        moveTimer += delta;
+
+        if(moveTimer >= moveDelay) {
+            headSprite.translateX(dirX);
+            headSprite.translateY(dirY);
+            moveTimer = 0f;
+        }
     }
 
     private void draw() {
