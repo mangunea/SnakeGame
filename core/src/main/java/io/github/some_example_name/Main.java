@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.Random;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -23,6 +25,10 @@ public class Main extends ApplicationAdapter {
     private Texture body;
     private Texture head;
     private Texture background;
+    public String lastKeyPressed; //chefck last key pressed for rotation
+
+
+    Array<Sprite> appleSprite;
 
     //grid settings
     private static final int tileSize = 8; //8 pixels
@@ -39,6 +45,7 @@ public class Main extends ApplicationAdapter {
         body = new Texture("body.png");
         head = new Texture("head.png");
         background = new Texture("background (1).png");
+        appleSprite = new Array<>();
 
         headSprite = new Sprite(head);
         headSprite.setSize(1, 1); //1 grid tile
@@ -61,20 +68,56 @@ public class Main extends ApplicationAdapter {
     private void input() {
         float speed = 4f;
         float delta = Gdx.graphics.getDeltaTime(); //curret delta for consistenycy
+        headSprite.setOrigin(headSprite.getWidth() / 2, headSprite.getHeight() / 2);
 
         //when press right key
         if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            headSprite.translateX(1);
-        }
+            if (lastKeyPressed == "RIGHT") { //check if user clicked right before this
+                headSprite.translateX(1);
+            }
+            else {
+                headSprite.translateX(1);
+                headSprite.setRotation(0f); //set to 0 first
+                headSprite.setRotation(90f);
+                lastKeyPressed = "RIGHT"; //if they didnt then set it right now
+            }
+        } //end of RIGHT
+
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            headSprite.translateX(-1);
-        }
+            if (lastKeyPressed == "LEFT") {
+                headSprite.translateX(-1);
+            }
+            else {
+                headSprite.translateX(-1);
+                headSprite.setRotation(0f); //set to 0 first
+                headSprite.setRotation(-90f);
+                lastKeyPressed = "LEFT";
+            }
+        } //end of LEFT
+
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            headSprite.translateY(1);
-        }
+            if (lastKeyPressed == "UP") {
+                headSprite.translateY(1);
+            }
+            else {
+                headSprite.translateY(1);
+                headSprite.setRotation(0f);
+                headSprite.setRotation(180);
+                lastKeyPressed = "UP";
+            }
+        } //end of UP
+
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            headSprite.translateY(-1);
-        }
+            if (lastKeyPressed == "DOWN") {
+                headSprite.translateY(-1);
+            }
+            else {
+                headSprite.translateY(-1);
+                headSprite.setRotation(0f);
+                lastKeyPressed = "DOWN";
+            }
+        } //end of DOWN
+
 
 
     }
@@ -88,6 +131,7 @@ public class Main extends ApplicationAdapter {
         //so head does not go past world border
         headSprite.setX(MathUtils.clamp(headSprite.getX(), 0, worldWidth - headWidth));
         headSprite.setY(MathUtils.clamp(headSprite.getY(), 0, worldHeight - headHeight));
+
     }
 
     private void draw() {
@@ -98,7 +142,25 @@ public class Main extends ApplicationAdapter {
 
         headSprite.draw(spriteBatch);
 
+        //draw each apple sprite
+        for (Sprite apple : appleSprite) {
+            apple.draw(spriteBatch);
+        }
+
         spriteBatch.end();
+    }
+
+    private void createApple() {
+
+        //create random
+        Random random = new Random();
+        int randomInt = random.nextInt(worldHeight); //height and widtrh are the same
+
+        //create apple
+        Sprite appleSprite = new Sprite(apple);
+        appleSprite.setSize(1, 1);
+        appleSprite.setX(randomInt);
+        appleSprite.setY(randomInt);
     }
 
     @Override
