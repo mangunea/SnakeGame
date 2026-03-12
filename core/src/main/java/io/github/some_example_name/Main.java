@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -29,7 +28,7 @@ public class Main extends ApplicationAdapter {
     public String lastKeyPressed; //chefck last key pressed for rotation
 
     //multiple apples array
-    Array<Sprite> appleSprite;
+    Array<Sprite> appleSprites;
 
     //grid settings
     private static final int tileSize = 8; //8 pixels
@@ -42,6 +41,9 @@ public class Main extends ApplicationAdapter {
     int dirX = 0;
     int dirY = -1; //starts by moving downwards
 
+    //gameover
+    boolean gameOver = false;
+
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
@@ -53,13 +55,14 @@ public class Main extends ApplicationAdapter {
         body = new Texture("body.png");
         head = new Texture("head.png");
         background = new Texture("background (1).png");
-        appleSprite = new Array<>();
+        appleSprites = new Array<>();
 
         headSprite = new Sprite(head);
         headSprite.setSize(1, 1); //1 grid tile
         headSprite.setPosition(8,8); //center
         headSprite.setOrigin(headSprite.getWidth() / 2, headSprite.getHeight() / 2); //set the origin of the head
 
+        createApple();
     }
 
     @Override
@@ -76,6 +79,9 @@ public class Main extends ApplicationAdapter {
     }
 
     private void input() {
+
+        if(gameOver) return; //stops if game is over
+
         float speed = 4f;
         float delta = Gdx.graphics.getDeltaTime(); //curret delta for consistenycy
 
@@ -84,36 +90,39 @@ public class Main extends ApplicationAdapter {
             dirY = 0;
             dirX = 1;
             headSprite.setRotation(90);
+            moveTimer = moveDelay; //prevents pause when changing direction
         } //end of RIGHT
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && dirX != -1) {
             dirY = 0;
             dirX = -1;
             headSprite.setRotation(-90);
+            moveTimer = moveDelay;
         } //end of LEFT
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && dirY != 1) {
             dirY = 1;
             dirX = 0;
             headSprite.setRotation(180);
+            moveTimer = moveDelay;
         } //end of UP
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && dirY != -1) {
             dirY = -1;
             dirX = 0;
             headSprite.setRotation(0);
+            moveTimer = moveDelay;
         } //end of DOWN
     }
 
     private void logic() {
+
+        if(gameOver) return;
+
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
         float headWidth = headSprite.getWidth();
         float headHeight = headSprite.getHeight();
-
-        //so head does not go past world border
-        headSprite.setX(MathUtils.clamp(headSprite.getX(), 0, worldWidth - headWidth));
-        headSprite.setY(MathUtils.clamp(headSprite.getY(), 0, worldHeight - headHeight));
 
         float delta = Gdx.graphics.getDeltaTime();
         moveTimer += delta;
@@ -122,6 +131,20 @@ public class Main extends ApplicationAdapter {
             headSprite.translateX(dirX);
             headSprite.translateY(dirY);
             moveTimer = 0f;
+        }
+
+        //collision detection with the border
+        float x = headSprite.getX();
+        float y = headSprite.getY();
+
+        if (x < 0 || x >=worldWidth || y < 0 || y>=worldHeight) {
+            gameOver = true;
+            System.out.println("Game Over.");
+            //add in game over screen
+
+
+        createApple();
+
         }
     }
 
@@ -134,10 +157,9 @@ public class Main extends ApplicationAdapter {
         headSprite.draw(spriteBatch);
 
         //draw each apple sprite
-        for (Sprite apple : appleSprite) {
+        for (Sprite apple : appleSprites) {
             apple.draw(spriteBatch);
         }
-
         spriteBatch.end();
     }
 
@@ -146,12 +168,20 @@ public class Main extends ApplicationAdapter {
         //create random
         Random random = new Random();
         int randomInt = random.nextInt(worldHeight); //height and widtrh are the same
+        float appleHeight = 1;
+        float appleWidth = 1;
 
         //create apple
         Sprite appleSprite = new Sprite(apple);
         appleSprite.setSize(1, 1);
+
         appleSprite.setX(randomInt);
         appleSprite.setY(randomInt);
+
+        //if apple is not in the coordinates of head then add to array
+        if (appleSprite.getX() != headSprite.getX() && appleSprite.getY() != headSprite.getY()) {
+            appleSprites.add(appleSprite);
+        }
     }
 
     @Override
