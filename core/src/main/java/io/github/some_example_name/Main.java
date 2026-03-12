@@ -141,11 +141,19 @@ public class Main extends ApplicationAdapter {
             gameOver = true;
             System.out.println("Game Over.");
             //add in game over screen
-
-
-        createApple();
-
         }
+
+        //if X and Y coords of current apple and head match then remove the apple and create a new one
+        for (int i = appleSprites.size - 1; i >= 0; i--) {
+            Sprite apple = appleSprites.get(i);
+
+            if(headSprite.getX() == apple.getX() && headSprite.getY() == apple.getY()) {
+                appleSprites.removeIndex(i); //remove eaten apple
+                createApple(); //create new
+
+                break;
+            } // end of if
+            } //end of for
     }
 
     private void draw() {
@@ -167,19 +175,18 @@ public class Main extends ApplicationAdapter {
 
         //create random
         Random random = new Random();
-        int randomInt = random.nextInt(worldHeight); //height and widtrh are the same
-        float appleHeight = 1;
-        float appleWidth = 1;
+        int randomY = random.nextInt(worldHeight);
+        int randomX = random.nextInt(worldWidth);
 
         //create apple
         Sprite appleSprite = new Sprite(apple);
         appleSprite.setSize(1, 1);
 
-        appleSprite.setX(randomInt);
-        appleSprite.setY(randomInt);
+        appleSprite.setX(randomX);
+        appleSprite.setY(randomY);
 
         //if apple is not in the coordinates of head then add to array
-        if (appleSprite.getX() != headSprite.getX() && appleSprite.getY() != headSprite.getY()) {
+        if(!(appleSprite.getX() == headSprite.getX() && appleSprite.getY() == headSprite.getY())) {
             appleSprites.add(appleSprite);
         }
     }
