@@ -29,6 +29,7 @@ public class Main extends ApplicationAdapter {
 
     //multiple apples array
     Array<Sprite> appleSprites;
+    Array<Sprite> snakeBody;
 
     //grid settings
     private static final int tileSize = 8; //8 pixels
@@ -55,7 +56,9 @@ public class Main extends ApplicationAdapter {
         body = new Texture("body.png");
         head = new Texture("head.png");
         background = new Texture("background (1).png");
+
         appleSprites = new Array<>();
+        snakeBody = new Array<>();
 
         headSprite = new Sprite(head);
         headSprite.setSize(1, 1); //1 grid tile
@@ -128,8 +131,24 @@ public class Main extends ApplicationAdapter {
         moveTimer += delta;
 
         if(moveTimer >= moveDelay) {
+
+            //store previous posisionts of the head for the body
+            float prevX = headSprite.getX();
+            float prevY = headSprite.getY();
+
             headSprite.translateX(dirX);
             headSprite.translateY(dirY);
+
+            //make body follow the head
+            for (int i = 0; i < snakeBody.size; i++) {
+                Sprite segement = snakeBody.get(i);
+                float tempX = segement.getX();
+                float tempY = segement.getY();
+
+                segement.setPosition(prevX, prevY);
+                prevX = tempX;
+                prevY = tempY;
+            }
             moveTimer = 0f;
         }
 
@@ -149,11 +168,12 @@ public class Main extends ApplicationAdapter {
 
             if(headSprite.getX() == apple.getX() && headSprite.getY() == apple.getY()) {
                 appleSprites.removeIndex(i); //remove eaten apple
+                addBodySegment(); // grow snake
                 createApple(); //create new
 
                 break;
             } // end of if
-            } //end of for
+        } //end of for
     }
 
     private void draw() {
@@ -161,6 +181,11 @@ public class Main extends ApplicationAdapter {
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
+
+        //draw each body sprite
+        for (Sprite segment : snakeBody) {
+            segment.draw(spriteBatch);
+        }
 
         headSprite.draw(spriteBatch);
 
@@ -189,6 +214,21 @@ public class Main extends ApplicationAdapter {
         if(!(appleSprite.getX() == headSprite.getX() && appleSprite.getY() == headSprite.getY())) {
             appleSprites.add(appleSprite);
         }
+    }
+
+    private void addBodySegment() {
+
+        Sprite segment = new Sprite(body);
+        segment.setSize(1, 1);
+
+        if (snakeBody.size == 0) {
+            segment.setPosition(headSprite.getX(), headSprite.getY());
+        }
+        else {
+            Sprite last = snakeBody.peek();
+            segment.setPosition(last.getX(), last.getY());
+        }
+        snakeBody.add(segment);
     }
 
     @Override
