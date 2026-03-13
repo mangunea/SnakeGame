@@ -60,7 +60,7 @@ public class Main extends ApplicationAdapter {
         apple = new Texture("apple.png");
         body = new Texture("body.png");
         head = new Texture("head.png");
-        background = new Texture("background (1).png");
+        background = new Texture("background.png");
 
         appleSprites = new Array<>();
         snakeBody = new Array<>();
@@ -214,6 +214,7 @@ public class Main extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
+        spriteBatch.draw(background, 0, 0, worldWidth, worldHeight);
         //draw each body sprite
         for (Sprite segment : snakeBody) {
             segment.draw(spriteBatch);
