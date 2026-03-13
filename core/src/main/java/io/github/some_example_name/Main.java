@@ -45,6 +45,11 @@ public class Main extends ApplicationAdapter {
     //gameover
     boolean gameOver = false;
 
+
+    /**
+     * CREATE Method
+     * Draw the elements as graphics here
+     */
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
@@ -68,11 +73,19 @@ public class Main extends ApplicationAdapter {
         createApple();
     }
 
+    /**
+     * RESIZE Method
+     * Update so that screen resized based on qindow
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true); // true centers the camera
     }
 
+    /**
+     * RENDER Method
+     * Contains the input, logic and draw methods
+     */
     @Override
     public void render() {
         // organize code into three methods
@@ -81,6 +94,10 @@ public class Main extends ApplicationAdapter {
         draw();
     }
 
+    /**
+     * INPUT Method
+     * User input to control the objects
+     */
     private void input() {
 
         if(gameOver) return; //stops if game is over
@@ -118,6 +135,10 @@ public class Main extends ApplicationAdapter {
         } //end of DOWN
     }
 
+    /**
+     * LOGIC Method
+     * Collision detections, movement and positions here
+     */
     private void logic() {
 
         if(gameOver) return;
@@ -183,6 +204,10 @@ public class Main extends ApplicationAdapter {
         } //end of for
     }
 
+    /**
+     * DRAW Method
+     * Draw the elemnt sprites here and set origins
+     */
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
@@ -203,6 +228,10 @@ public class Main extends ApplicationAdapter {
         spriteBatch.end();
     }
 
+    /**
+     * CREATEAPPLE Method
+     * Apple size, position and logic here
+     */
     private void createApple() {
 
         //create random
@@ -242,6 +271,10 @@ public class Main extends ApplicationAdapter {
         appleSprites.add(appleSprite);
     }
 
+    /**
+     * ADDBODYSEGMENT Method
+     * Snake body size and logic here
+     */
     private void addBodySegment() {
 
         Sprite segment = new Sprite(body);
@@ -257,6 +290,9 @@ public class Main extends ApplicationAdapter {
         snakeBody.add(segment);
     }
 
+    /**
+     * DISPOSE Method
+     */
     @Override
     public void dispose() {
 
