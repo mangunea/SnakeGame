@@ -200,8 +200,30 @@ public class Main extends ApplicationAdapter {
 
         //create random
         Random random = new Random();
-        int randomY = random.nextInt(worldHeight);
-        int randomX = random.nextInt(worldWidth);
+        int randomY = 0;
+        int randomX = 0;
+        boolean validPosition = false;
+
+        //before adding to the list make sure the coords are valid
+        while (!validPosition) {
+            randomX = random.nextInt(worldWidth);
+            randomY = random.nextInt(worldHeight);
+
+            validPosition = true;
+
+            //check the head position
+            if (randomX == headSprite.getX() && randomY == headSprite.getY()) {
+                validPosition = false;
+            }
+
+            //check the body of snake positions
+            for(Sprite segment : snakeBody) {
+                if(segment.getX() == randomX && segment.getY() == randomY) {
+                    validPosition = false;
+                    break;
+                } //end of if
+            } //end of for
+        } //end of while
 
         //create apple
         Sprite appleSprite = new Sprite(apple);
@@ -210,10 +232,7 @@ public class Main extends ApplicationAdapter {
         appleSprite.setX(randomX);
         appleSprite.setY(randomY);
 
-        //if apple is not in the coordinates of head then add to array
-        if(!(appleSprite.getX() == headSprite.getX() && appleSprite.getY() == headSprite.getY())) {
-            appleSprites.add(appleSprite);
-        }
+        appleSprites.add(appleSprite);
     }
 
     private void addBodySegment() {
