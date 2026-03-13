@@ -149,6 +149,13 @@ public class Main extends ApplicationAdapter {
                 prevX = tempX;
                 prevY = tempY;
             }
+
+            for( Sprite segment : snakeBody) {
+                if (headSprite.getX() == segment.getX() && headSprite.getY() == segment.getY()) {
+                    gameOver = true;
+                    break;
+                }
+            }
             moveTimer = 0f;
         }
 
