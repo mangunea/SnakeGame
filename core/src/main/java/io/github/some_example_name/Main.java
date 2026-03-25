@@ -42,6 +42,9 @@ public class Main extends ApplicationAdapter {
     int dirX = 0;
     int dirY = -1; //starts by moving downwards
 
+    //scoring
+    int score = 0;
+
     //gameover
     boolean gameOver = false;
 
@@ -196,9 +199,9 @@ public class Main extends ApplicationAdapter {
 
             if(headSprite.getX() == apple.getX() && headSprite.getY() == apple.getY()) {
                 appleSprites.removeIndex(i); //remove eaten apple
+                score++; //add a point
                 addBodySegment(); // grow snake
                 createApple(); //create new
-
                 break;
             } // end of if
         } //end of for
@@ -226,6 +229,7 @@ public class Main extends ApplicationAdapter {
         for (Sprite apple : appleSprites) {
             apple.draw(spriteBatch);
         }
+
         spriteBatch.end();
     }
 
@@ -296,6 +300,5 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void dispose() {
-
     }
 }
