@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -16,6 +17,7 @@ import java.util.Random;
 public class Main extends ApplicationAdapter {
     SpriteBatch spriteBatch;
     FitViewport viewport;
+    BitmapFont font;
 
     //new sprite variable for head
     Sprite headSprite;
@@ -32,9 +34,14 @@ public class Main extends ApplicationAdapter {
     Array<Sprite> snakeBody;
 
     //grid settings
+    int offsetX = 1;
+    int offsetY = 1;
     private static final int tileSize = 8; //8 pixels
-    private static final int worldHeight = 17; //17 grid
-    private static final int worldWidth = 17;
+    private static final int gridHeight = 17; //17 grid
+    private static final int gridWidth = 17;
+
+    private static final int worldHeight = gridHeight + 2; //increase unplayable area
+    private static final int worldWidth = gridWidth + 4;
 
     //constant movement
     float moveTimer = 0f;
@@ -56,6 +63,10 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
+
+        //for font
+        font = new BitmapFont();
+        font.getData().setScale(0.08f);
 
         //grid units
         viewport = new FitViewport(worldWidth, worldHeight);
@@ -217,7 +228,7 @@ public class Main extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-        spriteBatch.draw(background, 0, 0, worldWidth, worldHeight);
+        spriteBatch.draw(background, offsetX, offsetY, gridWidth, gridHeight);
         //draw each body sprite
         for (Sprite segment : snakeBody) {
             segment.draw(spriteBatch);
@@ -229,6 +240,9 @@ public class Main extends ApplicationAdapter {
         for (Sprite apple : appleSprites) {
             apple.draw(spriteBatch);
         }
+
+        //score
+        font.draw(spriteBatch, "Score: " + score, 1, worldHeight - 1);
 
         spriteBatch.end();
     }
@@ -300,5 +314,12 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void dispose() {
+        spriteBatch.dispose();
+        apple.dispose();
+        body.dispose();
+        head.dispose();
+        background.dispose();
+        font.dispose();
+
     }
 }
