@@ -40,8 +40,8 @@ public class Main extends ApplicationAdapter {
     private static final int gridHeight = 17; //17 grid
     private static final int gridWidth = 17;
 
-    private static final int worldHeight = gridHeight + 2; //increase unplayable area
-    private static final int worldWidth = gridWidth + 4;
+    private static final int worldWidth = gridWidth + 2; //increase unplayable area
+    private static final int worldHeight = gridHeight + 4;
 
     //constant movement
     float moveTimer = 0f;
@@ -66,7 +66,7 @@ public class Main extends ApplicationAdapter {
 
         //for font
         font = new BitmapFont();
-        font.getData().setScale(0.08f);
+        font.getData().setScale(0.05f);
 
         //grid units
         viewport = new FitViewport(worldWidth, worldHeight);
@@ -81,7 +81,7 @@ public class Main extends ApplicationAdapter {
 
         headSprite = new Sprite(head);
         headSprite.setSize(1, 1); //1 grid tile
-        headSprite.setPosition(8,8); //center
+        headSprite.setPosition(offsetX + gridWidth / 2f, offsetY + gridHeight / 2f); //center
         headSprite.setOrigin(headSprite.getWidth() / 2, headSprite.getHeight() / 2); //set the origin of the head
 
         createApple();
@@ -157,11 +157,6 @@ public class Main extends ApplicationAdapter {
 
         if(gameOver) return;
 
-        float worldWidth = viewport.getWorldWidth();
-        float worldHeight = viewport.getWorldHeight();
-        float headWidth = headSprite.getWidth();
-        float headHeight = headSprite.getHeight();
-
         float delta = Gdx.graphics.getDeltaTime();
         moveTimer += delta;
 
@@ -171,8 +166,11 @@ public class Main extends ApplicationAdapter {
             float prevX = headSprite.getX();
             float prevY = headSprite.getY();
 
-            headSprite.translateX(dirX);
-            headSprite.translateY(dirY);
+            //for perfect grid alignments
+            headSprite.setPosition(
+                Math.round(headSprite.getX() + dirX),
+                Math.round(headSprite.getY() + dirY)
+            );
 
             //make body follow the head
             for (int i = 0; i < snakeBody.size; i++) {
@@ -198,7 +196,7 @@ public class Main extends ApplicationAdapter {
         float x = headSprite.getX();
         float y = headSprite.getY();
 
-        if (x < 0 || x >=worldWidth || y < 0 || y>=worldHeight) {
+        if (x < offsetX || x >= offsetX + gridWidth || y < offsetY || y>=offsetY + gridHeight) {
             gameOver = true;
             System.out.println("Game Over.");
             //add in game over screen
@@ -208,7 +206,8 @@ public class Main extends ApplicationAdapter {
         for (int i = appleSprites.size - 1; i >= 0; i--) {
             Sprite apple = appleSprites.get(i);
 
-            if(headSprite.getX() == apple.getX() && headSprite.getY() == apple.getY()) {
+            //make sure both are integers not decimals
+            if((int)headSprite.getX() == (int)apple.getX() && (int)headSprite.getY() == (int)apple.getY()) {
                 appleSprites.removeIndex(i); //remove eaten apple
                 score++; //add a point
                 addBodySegment(); // grow snake
@@ -242,7 +241,7 @@ public class Main extends ApplicationAdapter {
         }
 
         //score
-        font.draw(spriteBatch, "Score: " + score, 1, worldHeight - 1);
+        font.draw(spriteBatch, "Score: " + score, 1, worldHeight - 0.5f);
 
         spriteBatch.end();
     }
@@ -261,13 +260,13 @@ public class Main extends ApplicationAdapter {
 
         //before adding to the list make sure the coords are valid
         while (!validPosition) {
-            randomX = random.nextInt(worldWidth);
-            randomY = random.nextInt(worldHeight);
+            randomX = random.nextInt(gridWidth) + offsetX;
+            randomY = random.nextInt(gridHeight) + offsetY;
 
             validPosition = true;
 
             //check the head position
-            if (randomX == headSprite.getX() && randomY == headSprite.getY()) {
+            if (randomX == (int)headSprite.getX() && randomY == (int)headSprite.getY()) {
                 validPosition = false;
             }
 
@@ -284,8 +283,7 @@ public class Main extends ApplicationAdapter {
         Sprite appleSprite = new Sprite(apple);
         appleSprite.setSize(1, 1);
 
-        appleSprite.setX(randomX);
-        appleSprite.setY(randomY);
+        appleSprite.setPosition(randomX, randomY);
 
         appleSprites.add(appleSprite);
     }
