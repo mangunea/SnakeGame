@@ -1,26 +1,31 @@
 package io.github.some_example_name;
 
+import java.util.Random;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import java.util.Random;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     SpriteBatch spriteBatch;
     FitViewport viewport;
+    OrthographicCamera hudCamera;
     BitmapFont font;
 
     //new sprite variable for head
     Sprite headSprite;
+
+    float targetWidth = 0;
 
     //load in textures
     private Texture apple;
@@ -64,9 +69,20 @@ public class Main extends ApplicationAdapter {
     public void create() {
         spriteBatch = new SpriteBatch();
 
-        //for font
+        targetWidth = worldWidth * tileSize;
+
         font = new BitmapFont();
-        font.getData().setScale(0.05f);
+        font.getData().setScale(2f);
+        font.setColor(Color.WHITE);
+
+        hudCamera = new OrthographicCamera();
+        hudCamera.setToOrtho(false, Math.max(1, Gdx.graphics.getWidth()), Math.max(1, Gdx.graphics.getHeight()));
+        hudCamera.update();
+
+        //for font
+        // font = new BitmapFont();
+        // font.getData().setScale(0.12f);
+        // layout = new GlyphLayout(font, "Score: 0", Color.WHITE, 200,1, false); //initial score
 
         //grid units
         viewport = new FitViewport(worldWidth, worldHeight);
@@ -94,6 +110,10 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true); // true centers the camera
+        if (hudCamera != null) {
+            hudCamera.setToOrtho(false, Math.max(1, width), Math.max(1, height));
+            hudCamera.update();
+        }
     }
 
     /**
@@ -224,25 +244,25 @@ public class Main extends ApplicationAdapter {
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
+
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
         spriteBatch.draw(background, offsetX, offsetY, gridWidth, gridHeight);
-        //draw each body sprite
         for (Sprite segment : snakeBody) {
             segment.draw(spriteBatch);
         }
 
         headSprite.draw(spriteBatch);
 
-        //draw each apple sprite
         for (Sprite apple : appleSprites) {
             apple.draw(spriteBatch);
         }
+        spriteBatch.end();
 
-        //score
-        font.draw(spriteBatch, "Score: " + score, 1, worldHeight - 0.5f);
-
+        spriteBatch.setProjectionMatrix(hudCamera.combined);
+        spriteBatch.begin();
+        font.draw(spriteBatch, "Score: " + score, 20f, Gdx.graphics.getHeight() - 20f);
         spriteBatch.end();
     }
 
@@ -318,6 +338,5 @@ public class Main extends ApplicationAdapter {
         head.dispose();
         background.dispose();
         font.dispose();
-
     }
 }
