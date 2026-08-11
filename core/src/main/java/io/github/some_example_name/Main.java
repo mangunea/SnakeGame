@@ -11,12 +11,15 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.Random;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     SpriteBatch spriteBatch;
     FitViewport viewport;
+    ScreenViewport uiViewport;
     BitmapFont font;
 
     //new sprite variable for head
@@ -66,10 +69,13 @@ public class Main extends ApplicationAdapter {
 
         //for font
         font = new BitmapFont();
-        font.getData().setScale(0.05f);
+        font.getData().setScale(2f);
 
         //grid units
         viewport = new FitViewport(worldWidth, worldHeight);
+
+        //screen/pixel units for UI text
+        uiViewport = new ScreenViewport();
 
         apple = new Texture("apple.png");
         body = new Texture("body.png");
@@ -94,6 +100,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true); // true centers the camera
+        uiViewport.update(width, height, true);
     }
 
     /**
@@ -223,11 +230,13 @@ public class Main extends ApplicationAdapter {
      */
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
+
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
         spriteBatch.draw(background, offsetX, offsetY, gridWidth, gridHeight);
+
         //draw each body sprite
         for (Sprite segment : snakeBody) {
             segment.draw(spriteBatch);
@@ -240,12 +249,21 @@ public class Main extends ApplicationAdapter {
             apple.draw(spriteBatch);
         }
 
-        //score
-        font.draw(spriteBatch, "Score: " + score, 1, worldHeight - 0.5f);
+        spriteBatch.end();
+
+        // Draw UI text in screen pixels, not tiny world units
+        uiViewport.apply();
+        spriteBatch.setProjectionMatrix(uiViewport.getCamera().combined);
+        spriteBatch.begin();
+
+        font.draw(spriteBatch, "Score: " + score, 20, uiViewport.getWorldHeight() - 20);
+
+        if (gameOver) {
+            font.draw(spriteBatch, "Game Over", 20, uiViewport.getWorldHeight() - 60);
+        }
 
         spriteBatch.end();
     }
-
     /**
      * CREATEAPPLE Method
      * Apple size, position and logic here
